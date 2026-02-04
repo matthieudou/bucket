@@ -3,30 +3,15 @@ import { devtools } from '@tanstack/devtools-vite'
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 import viteReact from '@vitejs/plugin-react'
 import viteTsConfigPaths from 'vite-tsconfig-paths'
-import { fileURLToPath, URL } from 'url'
-import path from 'path'
-
-const projectRoot = fileURLToPath(new URL('.', import.meta.url))
+import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
-  resolve: {
-    alias: {
-      '@': fileURLToPath(new URL('./src', import.meta.url)),
-      '@convex': path.resolve(projectRoot, '../convex/convex'),
-    },
-  },
-  server: {
-    fs: {
-      allow: ['..'],
-    },
-  },
   plugins: [
     devtools(),
-    // this is the plugin that enables path aliases
+    tailwindcss(),
     viteTsConfigPaths({
       projects: ['./tsconfig.json'],
     }),
-
     tanstackStart(),
     viteReact(),
   ],
