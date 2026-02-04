@@ -1,0 +1,17 @@
+node_modules
+.turbo
+.DS_Store
+
+.env
+.env.*
+!.env.example
+!apps/web/.env.example
+
+apps/convex/.convex
+apps/convex/convex/_generated
+
+apps/web/node_modules
+apps/convex/node_modules
+
+/dist
+/.output

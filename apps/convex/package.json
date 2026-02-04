@@ -1,0 +1,22 @@
+{
+  "name": "convex",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "convex dev",
+    "deploy": "convex deploy",
+    "codegen": "convex codegen",
+    "typecheck": "tsc --noEmit",
+    "lint": "oxlint .",
+    "fmt": "oxfmt --write .",
+    "fmt:check": "oxfmt --check ."
+  },
+  "dependencies": {
+    "convex": "^1.16.0",
+    "@convex-dev/auth": "^0.0.77",
+    "@auth/core": "^0.38.0"
+  },
+  "devDependencies": {
+    "typescript": "^5.7.2"
+  }
+}
