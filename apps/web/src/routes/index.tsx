@@ -80,13 +80,15 @@ function SignInCard() {
         className="signin-form"
         onSubmit={(event) => {
           event.preventDefault()
-          void signIn('password', { email, password, flow })
+          const formData = new FormData(event.currentTarget)
+          void signIn('password', formData)
         }}
       >
         <input
           className="field"
           type="email"
           placeholder="you@bucket.com"
+          name="email"
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           required
@@ -95,10 +97,12 @@ function SignInCard() {
           className="field"
           type="password"
           placeholder="Password"
+          name="password"
           value={password}
           onChange={(event) => setPassword(event.target.value)}
           required
         />
+        <input type="hidden" name="flow" value={flow} />
         <button className="primary-button" type="submit">
           {flow === 'signIn' ? 'Sign in with email' : 'Create account'}
         </button>
