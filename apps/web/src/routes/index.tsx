@@ -70,6 +70,7 @@ function SignInCard() {
   const { signIn } = useAuthActions()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const [flow, setFlow] = useState<'signIn' | 'signUp'>('signIn')
 
   return (
     <div className="signin-card">
@@ -79,7 +80,7 @@ function SignInCard() {
         className="signin-form"
         onSubmit={(event) => {
           event.preventDefault()
-          void signIn('password', { email, password })
+          void signIn('password', { email, password, flow })
         }}
       >
         <input
@@ -99,7 +100,16 @@ function SignInCard() {
           required
         />
         <button className="primary-button" type="submit">
-          Sign in with email
+          {flow === 'signIn' ? 'Sign in with email' : 'Create account'}
+        </button>
+        <button
+          className="ghost-button"
+          type="button"
+          onClick={() =>
+            setFlow((current) => (current === 'signIn' ? 'signUp' : 'signIn'))
+          }
+        >
+          {flow === 'signIn' ? 'New here? Sign up' : 'Have an account? Sign in'}
         </button>
       </form>
       <div className="signin-actions">
