@@ -1,5 +1,6 @@
 {
   "$schema": "https://turbo.build/schema.json",
+  "globalPassThroughEnv": ["VITE_*"],
   "tasks": {
     "dev": {
       "cache": false,
@@ -7,8 +8,7 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".output/**", "dist/**"],
-      "globalPassThroughEnv": ["VITE_*"]
+      "outputs": [".output/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
