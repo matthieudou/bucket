@@ -1,72 +1,70 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { useCallback, useEffect, useRef, useState } from 'react'
-import { useQuery } from '@tanstack/react-query'
-import { convexQuery } from '@convex-dev/react-query'
-import { useMutation, Unauthenticated } from 'convex/react'
-import { useAuthActions } from '@convex-dev/auth/react'
+import { createFileRoute } from '@tanstack/react-router';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+import { convexQuery } from '@convex-dev/react-query';
+import { useMutation, Unauthenticated } from 'convex/react';
+import { useAuthActions } from '@convex-dev/auth/react';
 
-import { api } from '@convex/_generated/api'
-import Header from '../components/Header'
+import { api } from '@convex/_generated/api';
+import Header from '../components/Header';
 
-export const Route = createFileRoute('/')({ component: BucketHome })
+export const Route = createFileRoute('/')({ component: BucketHome });
 
 function BucketHome() {
-  const { data } = useQuery(convexQuery(api.tiles.listMine, {}))
-  const tiles = data ?? []
-  const { signIn } = useAuthActions()
-  const createTile = useMutation(api.tiles.createImageTile)
-  const generateUploadUrl = useMutation(api.tiles.generateUploadUrl)
-  const [isDragging, setIsDragging] = useState(false)
-  const [isUploading, setIsUploading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const fileInputRef = useRef<HTMLInputElement | null>(null)
+  const { data } = useQuery(convexQuery(api.tiles.listMine, {}));
+  const tiles = data ?? [];
+  const { signIn } = useAuthActions();
+  const createTile = useMutation(api.tiles.createImageTile);
+  const generateUploadUrl = useMutation(api.tiles.generateUploadUrl);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleFiles = useCallback(
     async (fileList: FileList | File[]) => {
-      const file = Array.from(fileList).find((item) =>
-        item.type.startsWith('image/'),
-      )
+      const file = Array.from(fileList).find((item) => item.type.startsWith('image/'));
       if (!file) {
-        setError('Drop an image to add a tile.')
-        return
+        setError('Drop an image to add a tile.');
+        return;
       }
 
-      setIsUploading(true)
-      setError(null)
+      setIsUploading(true);
+      setError(null);
       try {
-        const ratio = await getImageRatio(file)
-        const size = chooseTileSize(ratio, tiles.length)
-        const position = findNextPosition(tiles, size)
-        const uploadUrl = await generateUploadUrl()
+        const ratio = await getImageRatio(file);
+        const size = chooseTileSize(ratio, tiles.length);
+        const position = findNextPosition(tiles, size);
+        const uploadUrl = await generateUploadUrl();
         const response = await fetch(uploadUrl, {
           method: 'POST',
           headers: { 'Content-Type': file.type },
           body: file,
-        })
+        });
         const { storageId } = (await response.json()) as {
-          storageId: string
-        }
+          storageId: string;
+        };
         await createTile({
           storageId,
           position,
           size,
           title: file.name.replace(/\.[^/.]+$/, ''),
-        })
+        });
       } catch (error) {
-        console.error(error)
-        setError('Upload failed. Please try again.')
+        console.error(error);
+        setError('Upload failed. Please try again.');
       } finally {
-        setIsUploading(false)
+        setIsUploading(false);
       }
     },
     [createTile, generateUploadUrl, tiles],
-  )
+  );
 
   const openFilePicker = useCallback(() => {
-    fileInputRef.current?.click()
-  }, [])
+    fileInputRef.current?.click();
+  }, []);
 
-  const handleAnonymousSignIn = useCallback(() => signIn('anonymous'), [signIn])
+  const handleAnonymousSignIn = useCallback(() => signIn('anonymous'), [signIn]);
 
   return (
     <div className="min-h-screen pb-20">
@@ -80,19 +78,19 @@ function BucketHome() {
             isDragging ? 'ring-2 ring-slate-300' : ''
           }`}
           onDragOver={(event) => {
-            event.preventDefault()
-            setIsDragging(true)
+            event.preventDefault();
+            setIsDragging(true);
           }}
           onDragLeave={(event) => {
             if (event.currentTarget === event.target) {
-              setIsDragging(false)
+              setIsDragging(false);
             }
           }}
           onDrop={(event) => {
-            event.preventDefault()
-            setIsDragging(false)
+            event.preventDefault();
+            setIsDragging(false);
             if (event.dataTransfer.files?.length) {
-              void handleFiles(event.dataTransfer.files)
+              void handleFiles(event.dataTransfer.files);
             }
           }}
         >
@@ -103,9 +101,9 @@ function BucketHome() {
             className="hidden"
             onChange={(event) => {
               if (event.target.files?.length) {
-                void handleFiles(event.target.files)
+                void handleFiles(event.target.files);
               }
-              event.target.value = ''
+              event.target.value = '';
             }}
           />
           <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm text-slate-500">
@@ -115,7 +113,7 @@ function BucketHome() {
           </div>
           <div className="grid grid-cols-3 auto-rows-[120px] gap-4 sm:auto-rows-[160px] sm:gap-6">
             {tiles.map((tile) => {
-              const placement = toGridPlacement(tile)
+              const placement = toGridPlacement(tile);
               return (
                 <article
                   key={tile._id}
@@ -135,7 +133,7 @@ function BucketHome() {
                     </div>
                   )}
                 </article>
-              )
+              );
             })}
             {tiles.length === 0 && (
               <div className="col-span-3 rounded-[24px] border border-dashed border-slate-200 py-16 text-center text-sm text-slate-400">
@@ -146,108 +144,108 @@ function BucketHome() {
         </div>
       </section>
     </div>
-  )
+  );
 }
 
 function AutoSignIn({ onSignIn }: { onSignIn: () => void }) {
   useEffect(() => {
-    void onSignIn()
-  }, [onSignIn])
+    void onSignIn();
+  }, [onSignIn]);
 
   return (
     <div className="mx-auto mt-6 w-full max-w-5xl px-6 text-sm text-slate-400">
       Signing you in anonymously…
     </div>
-  )
+  );
 }
 
 function chooseTileSize(ratio: number, existingCount: number) {
   if (existingCount === 0) {
-    return { w: 3, h: 2 }
+    return { w: 3, h: 2 };
   }
   if (ratio >= 1.45) {
-    return { w: 2, h: 1 }
+    return { w: 2, h: 1 };
   }
   if (ratio <= 0.8) {
-    return { w: 1, h: 2 }
+    return { w: 1, h: 2 };
   }
-  return { w: 1, h: 1 }
+  return { w: 1, h: 1 };
 }
 
 function toGridPlacement(tile: {
-  position: { x: number; y: number }
-  size: { w: number; h: number }
+  position: { x: number; y: number };
+  size: { w: number; h: number };
 }) {
-  const x = Math.max(1, Math.round(tile.position.x))
-  const y = Math.max(1, Math.round(tile.position.y))
-  const w = Math.max(1, Math.round(tile.size.w))
-  const h = Math.max(1, Math.round(tile.size.h))
+  const x = Math.max(1, Math.round(tile.position.x));
+  const y = Math.max(1, Math.round(tile.position.y));
+  const w = Math.max(1, Math.round(tile.size.w));
+  const h = Math.max(1, Math.round(tile.size.h));
 
   return {
     gridColumn: `${x} / span ${w}`,
     gridRow: `${y} / span ${h}`,
-  } as const
+  } as const;
 }
 
 function findNextPosition(
   tiles: Array<{
-    position: { x: number; y: number }
-    size: { w: number; h: number }
+    position: { x: number; y: number };
+    size: { w: number; h: number };
   }>,
   size: { w: number; h: number },
 ) {
-  const gridWidth = 3
-  const occupied = new Set<string>()
-  let maxRow = 1
+  const gridWidth = 3;
+  const occupied = new Set<string>();
+  let maxRow = 1;
 
   tiles.forEach((tile) => {
-    const x = Math.max(1, Math.round(tile.position.x))
-    const y = Math.max(1, Math.round(tile.position.y))
-    const w = Math.max(1, Math.round(tile.size.w))
-    const h = Math.max(1, Math.round(tile.size.h))
-    maxRow = Math.max(maxRow, y + h)
+    const x = Math.max(1, Math.round(tile.position.x));
+    const y = Math.max(1, Math.round(tile.position.y));
+    const w = Math.max(1, Math.round(tile.size.w));
+    const h = Math.max(1, Math.round(tile.size.h));
+    maxRow = Math.max(maxRow, y + h);
 
     for (let dy = 0; dy < h; dy += 1) {
       for (let dx = 0; dx < w; dx += 1) {
-        occupied.add(`${x + dx}:${y + dy}`)
+        occupied.add(`${x + dx}:${y + dy}`);
       }
     }
-  })
+  });
 
   const fits = (x: number, y: number) => {
-    if (x + size.w - 1 > gridWidth) return false
+    if (x + size.w - 1 > gridWidth) return false;
     for (let dy = 0; dy < size.h; dy += 1) {
       for (let dx = 0; dx < size.w; dx += 1) {
-        if (occupied.has(`${x + dx}:${y + dy}`)) return false
+        if (occupied.has(`${x + dx}:${y + dy}`)) return false;
       }
     }
-    return true
-  }
+    return true;
+  };
 
   for (let y = 1; y <= maxRow + 6; y += 1) {
     for (let x = 1; x <= gridWidth; x += 1) {
       if (fits(x, y)) {
-        return { x, y }
+        return { x, y };
       }
     }
   }
 
-  return { x: 1, y: maxRow + 1 }
+  return { x: 1, y: maxRow + 1 };
 }
 
 function getImageRatio(file: File) {
   return new Promise<number>((resolve) => {
-    const url = URL.createObjectURL(file)
-    const img = new Image()
+    const url = URL.createObjectURL(file);
+    const img = new Image();
     img.onload = () => {
-      const ratio = img.width && img.height ? img.width / img.height : 1
-      URL.revokeObjectURL(url)
-      resolve(ratio)
-    }
+      const ratio = img.width && img.height ? img.width / img.height : 1;
+      URL.revokeObjectURL(url);
+      resolve(ratio);
+    };
     img.onerror = () => {
-      URL.revokeObjectURL(url)
-      resolve(1)
-    }
-    img.src = url
-  })
+      URL.revokeObjectURL(url);
+      resolve(1);
+    };
+    img.src = url;
+  });
 }

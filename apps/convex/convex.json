@@ -1,5 +1,5 @@
 {
-  "functions": "./convex",
+  "functions": "./src",
   "node": {
     "nodeVersion": "22"
   }

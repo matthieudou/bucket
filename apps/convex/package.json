@@ -12,11 +12,13 @@
     "fmt:check": "oxfmt --check ."
   },
   "dependencies": {
-    "convex": "^1.16.0",
+    "@auth/core": "^0.38.0",
     "@convex-dev/auth": "^0.0.77",
-    "@auth/core": "^0.38.0"
+    "convex": "^1.16.0"
   },
   "devDependencies": {
+    "oxfmt": "^0.28.0",
+    "oxlint": "^1.43.0",
     "typescript": "^5.7.2"
   }
 }
