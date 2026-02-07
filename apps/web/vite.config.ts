@@ -16,7 +16,7 @@ const config = defineConfig({
     }),
     tanstackStart(),
     nitro({
-      preset: 'netlify',
+      preset: 'vercel',
     }),
     viteReact(),
   ],
