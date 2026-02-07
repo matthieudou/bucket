@@ -7,7 +7,8 @@
     },
     "build": {
       "dependsOn": ["^build"],
-      "outputs": [".output/**", "dist/**"]
+      "outputs": [".output/**", "dist/**"],
+      "globalPassThroughEnv": ["VITE_*"]
     },
     "lint": {
       "dependsOn": ["^lint"]
